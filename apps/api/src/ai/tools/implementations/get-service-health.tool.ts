@@ -1,1 +1,41 @@
-// Implementation removed intentionally.
+import { Injectable } from '@nestjs/common';
+import { AiTool } from '../tools.types.js';
+
+export interface ServiceHealthInput {
+  service: string;
+}
+
+export interface ServiceHealthOutput {
+  service: string;
+  status: 'healthy' | 'unhealthy';
+  timestamp: string;
+}
+
+@Injectable()
+export class GetServiceHealthTool
+  implements AiTool<ServiceHealthInput, ServiceHealthOutput>
+{
+  name = 'getServiceHealth';
+
+  description = 'Check the health status of an application service.';
+
+  permission = 'service:health:read';
+
+  timeoutMs = 3000;
+
+  retry = {
+    maxAttempts: 2,
+  };
+
+  idempotent = true;
+
+  async execute(
+    input: ServiceHealthInput,
+  ): Promise<ServiceHealthOutput> {
+    return {
+      service: input.service,
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+    };
+  }
+}

@@ -3,6 +3,8 @@ export interface AiTool<TInput = unknown, TOutput = unknown> {
 
   description: string;
 
+  inputSchema: Record<string, unknown>;
+
   execute(input: TInput): Promise<TOutput>;
 
   permission: string;

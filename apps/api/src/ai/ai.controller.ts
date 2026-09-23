@@ -1,4 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+} from '@nestjs/common';
+
 import { AiService } from './ai.service';
 
 class ChatRequestDto {
@@ -12,7 +17,11 @@ export class AiController {
   ) {}
 
   @Post('chat')
-  async chat(@Body() body: ChatRequestDto) {
-    return this.aiService.chat(body.message);
+  async chat(
+    @Body() body: ChatRequestDto,
+  ) {
+    return this.aiService.chat(
+      body.message,
+    );
   }
 }

@@ -8,9 +8,23 @@ export interface LlmTool {
   };
 }
 
+export interface LlmToolCallMessage {
+  id: string;
+  name: string;
+  args: Record<string, unknown>;
+}
+
+export interface LlmMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string;
+
+  tool_call_id?: string;
+
+  tool_calls?: LlmToolCallMessage[];
+}
+
 export interface LlmRequest {
-  message: string;
-  systemPrompt?: string;
+  messages: LlmMessage[];
   tools?: LlmTool[];
 }
 
@@ -22,7 +36,8 @@ export interface LlmToolCall {
 
 export interface LlmResponse {
   content: string;
-  toolCalls?: LlmToolCall[];
+  toolCalls: LlmToolCall[];
+  rawMessage?: unknown;
 }
 
 export interface LlmProvider {

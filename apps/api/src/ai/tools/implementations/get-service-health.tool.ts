@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { AiTool } from '../tools.types.js';
+
+import { AiTool } from '../tools.types';
 
 export interface ServiceHealthInput {
   service: string;
@@ -17,7 +18,20 @@ export class GetServiceHealthTool
 {
   name = 'getServiceHealth';
 
-  description = 'Check the health status of an application service.';
+  description =
+    'Check the health status of an application service.';
+
+  inputSchema = {
+    type: 'object',
+    properties: {
+      service: {
+        type: 'string',
+        description: 'Name of the service to check',
+      },
+    },
+    required: ['service'],
+    additionalProperties: false,
+  };
 
   permission = 'service:health:read';
 

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Post,
 } from '@nestjs/common';
 
@@ -22,14 +23,17 @@ export class AiController {
   @Post('chat')
   async chat(
     @Body() body: ChatRequestDto,
+     @Headers('x-request-id') requestId?: string,
   ) {
     return this.aiService.chat(
       body.message,
+      requestId,
     );
   }
 
   @Get('metrics')
   getMetrics() {
+    // TODO: protect with internal/admin authorization
     return this.aiMetrics.snapshot();
   }
 }

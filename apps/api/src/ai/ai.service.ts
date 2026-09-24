@@ -17,6 +17,8 @@ import { randomUUID } from 'node:crypto';
 import { AiLogger } from './observability/ai.logger';
 import { PromptSafetyService } from './guardrails/prompt-safety.service';
 import { AiMetrics } from './observability/ai.metrics';
+import { AiRequestContext } from 'src/security/ai-request-context';
+import { AiChatResponse, ToolAction } from './ai.types';
 
 @Injectable()
 export class AiService {
@@ -32,14 +34,15 @@ export class AiService {
         private readonly aiMetrics: AiMetrics,
     ) { }
 
-    async chat(message: string) {
-        const requestId = randomUUID();
+    async chat(message: string, requestId?: string): Promise<AiChatResponse> {
+        const correlationId = requestId ?? randomUUID();
         const startedAt = Date.now();
 
         this.aiMetrics.requestStarted();
 
-        const logContext = {
-            requestId,
+        const logContext: AiRequestContext = {
+            requestId: correlationId,
+            permissions: ['service:health:read'],
         };
 
         this.aiLogger.requestStarted(
@@ -66,6 +69,10 @@ export class AiService {
                 content:
                     'I cannot process that request because it contains an unsafe instruction pattern.',
                 toolActions: [],
+                metadata: {
+                    requestId: correlationId,
+                    safety: 'blocked',
+                },
             };
         }
 
@@ -124,7 +131,7 @@ export class AiService {
                 },
             ];
 
-            const toolActions: unknown[] = [];
+            const toolActions: ToolAction[] = [];
 
             for (
                 let iteration = 0;
@@ -162,6 +169,10 @@ export class AiService {
                     return {
                         content: response.content,
                         toolActions,
+                        metadata: {
+                            requestId: correlationId,
+                            safety: 'allowed',
+                        }
                     };
                 }
 
@@ -209,7 +220,7 @@ export class AiService {
                         result = await this.toolExecutor.execute(
                             tool,
                             toolCall.input,
-                            ['service:health:read'],
+                            logContext.permissions,
                         );
 
                         this.aiMetrics.toolCompleted(

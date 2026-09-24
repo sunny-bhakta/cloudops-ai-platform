@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
 } from '@nestjs/common';
 
 import { AiService } from './ai.service';
+import { AiMetrics } from './observability/ai.metrics';
 
 class ChatRequestDto {
   message!: string;
@@ -14,7 +16,8 @@ class ChatRequestDto {
 export class AiController {
   constructor(
     private readonly aiService: AiService,
-  ) {}
+    private readonly aiMetrics: AiMetrics,
+  ) { }
 
   @Post('chat')
   async chat(
@@ -23,5 +26,10 @@ export class AiController {
     return this.aiService.chat(
       body.message,
     );
+  }
+
+  @Get('metrics')
+  getMetrics() {
+    return this.aiMetrics.snapshot();
   }
 }

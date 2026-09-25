@@ -1,22 +1,54 @@
-FROM node:22-alpine AS deps
+FROM node:22.22.3-bookworm-slim AS deps
+
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm ci
 
-FROM node:22-alpine AS build
+RUN node -v && npm -v
+
+RUN npm ci --verbose \
+	|| (echo "npm ci failed in deps stage" \
+			&& ls -la /root/.npm/_logs || true \
+			&& cat /root/.npm/_logs/*-debug-0.log || true \
+			&& exit 1)
+
+
+FROM node:22.22.3-bookworm-slim AS builder
+
 WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npm run build
-RUN npm prune --omit=dev
 
-FROM node:22-alpine AS runtime
+COPY . .
+
+RUN npm run build
+
+
+FROM node:22.22.3-bookworm-slim AS prod-deps
+
 WORKDIR /app
+
+COPY package*.json ./
+
+RUN node -v && npm -v
+
+RUN npm ci --omit=dev --verbose \
+	|| (echo "npm ci --omit=dev failed in prod-deps stage" \
+			&& ls -la /root/.npm/_logs || true \
+			&& cat /root/.npm/_logs/*-debug-0.log || true \
+			&& exit 1)
+
+
+FROM node:22.22.3-bookworm-slim AS production
+
+WORKDIR /app
+
 ENV NODE_ENV=production
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+
+COPY --from=prod-deps /app/node_modules ./node_modules
+
+COPY --from=builder /app/dist ./dist
+
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/health || exit 1
-CMD ["node", "dist/main"]
+
+CMD ["node", "dist/main.js"]

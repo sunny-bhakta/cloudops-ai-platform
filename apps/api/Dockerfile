@@ -6,6 +6,11 @@ COPY package*.json ./
 
 RUN node -v && npm -v
 
+RUN echo "--- deps stage manifest check ---" \
+  && ls -la \
+  && grep -n "\"typescript\"" package.json || true \
+  && grep -n "\"typescript\"" package-lock.json | head -n 20 || true
+
 RUN npm ci --verbose \
 	|| (echo "npm ci failed in deps stage" \
 			&& ls -la /root/.npm/_logs || true \
@@ -31,6 +36,11 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN node -v && npm -v
+
+RUN echo "--- prod-deps stage manifest check ---" \
+  && ls -la \
+  && grep -n "\"typescript\"" package.json || true \
+  && grep -n "\"typescript\"" package-lock.json | head -n 20 || true
 
 RUN npm ci --omit=dev --verbose \
 	|| (echo "npm ci --omit=dev failed in prod-deps stage" \

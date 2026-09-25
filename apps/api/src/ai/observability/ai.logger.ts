@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PiiRedactionService } from '../guardrails/pii-redaction.service';
+import { PiiRedactionService } from '../guardrails/pii-redaction.service.js';
 
 export interface AiLogContext {
   requestId: string;

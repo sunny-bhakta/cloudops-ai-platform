@@ -6,8 +6,8 @@ import {
   Post,
 } from '@nestjs/common';
 
-import { AiService } from './ai.service';
-import { AiMetrics } from './observability/ai.metrics';
+import { AiService } from './ai.service.js';
+import { AiMetrics } from './observability/ai.metrics.js';
 
 class ChatRequestDto {
   message!: string;

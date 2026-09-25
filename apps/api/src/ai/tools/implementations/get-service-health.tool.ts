@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { AiTool } from '../tools.types';
+import { AiTool } from '../tools.types.js';
 
 export interface ServiceHealthInput {
   service: string;

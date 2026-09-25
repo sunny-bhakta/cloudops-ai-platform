@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import Ajv, { ValidateFunction } from 'ajv';
-import { AiTool } from './tools.types';
-import { PermissionService } from '../../security/permission.service';
+import { Ajv } from 'ajv';
+import type { ValidateFunction } from 'ajv';
+
+import { AiTool } from './tools.types.js';
+import { PermissionService } from '../../security/permission.service.js';
 
 @Injectable()
 export class ToolExecutor {
@@ -15,7 +17,9 @@ export class ToolExecutor {
     ValidateFunction
   >();
 
-  constructor(  private readonly permissionService: PermissionService,) {}
+  constructor(
+    private readonly permissionService: PermissionService,
+  ) {}
 
 async execute<TInput, TOutput>(
   tool: AiTool<TInput, TOutput>,
@@ -70,12 +74,7 @@ async execute<TInput, TOutput>(
     tool: AiTool<TInput, unknown>,
     input: TInput,
   ): void {
-    let validator = this.validators.get(tool.name);
-
-    if (!validator) {
-      validator = this.ajv.compile(tool.inputSchema);
-      this.validators.set(tool.name, validator);
-    }
+    const validator = this.getOrCreateValidator(tool);
 
     const valid = validator(input);
 
@@ -85,6 +84,21 @@ async execute<TInput, TOutput>(
           this.ajv.errorsText(validator.errors),
       );
     }
+  }
+
+  private getOrCreateValidator<TInput>(
+    tool: AiTool<TInput, unknown>,
+  ): ValidateFunction {
+    const cachedValidator = this.validators.get(tool.name);
+
+    if (cachedValidator) {
+      return cachedValidator;
+    }
+
+    const compiledValidator = this.ajv.compile(tool.inputSchema);
+    this.validators.set(tool.name, compiledValidator);
+
+    return compiledValidator;
   }
 
   private async executeWithTimeout<TInput, TOutput>(

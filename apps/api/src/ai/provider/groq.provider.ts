@@ -12,7 +12,7 @@ import {
   LlmProvider,
   LlmRequest,
   LlmResponse,
-} from './llm.provider';
+} from './llm.provider.js';
 
 @Injectable()
 export class GroqProvider implements LlmProvider {

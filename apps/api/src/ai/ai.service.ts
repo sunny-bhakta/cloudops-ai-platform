@@ -5,20 +5,20 @@ import {
 
 import {
     LLM_PROVIDER,
-    LlmMessage,
-    LlmProvider,
-} from './provider/llm.provider';
+    type LlmMessage,
+    type LlmProvider,
+} from './provider/llm.provider.js';
 
 import {
     ToolRegistry,
-} from './tools/tool-registry';
-import { ToolExecutor } from './tools/tool-executor';
+} from './tools/tool-registry.js';
+import { ToolExecutor } from './tools/tool-executor.js';
 import { randomUUID } from 'node:crypto';
-import { AiLogger } from './observability/ai.logger';
-import { PromptSafetyService } from './guardrails/prompt-safety.service';
-import { AiMetrics } from './observability/ai.metrics';
-import { AiRequestContext } from 'src/security/ai-request-context';
-import { AiChatResponse, ToolAction } from './ai.types';
+import { AiLogger } from './observability/ai.logger.js';
+import { PromptSafetyService } from './guardrails/prompt-safety.service.js';
+import { AiMetrics } from './observability/ai.metrics.js';
+import { AiRequestContext } from '../security/ai-request-context.js';
+import { AiChatResponse, ToolAction } from './ai.types.js';
 
 @Injectable()
 export class AiService {

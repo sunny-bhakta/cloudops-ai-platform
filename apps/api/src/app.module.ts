@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { HealthController } from './health.controller';
+import { HealthController } from './health.controller.js';
 import { ConfigModule } from '@nestjs/config';
-import { AiModule } from './ai/ai.module';
+import { AiModule } from './ai/ai.module.js';
 
 @Module({
 	imports: [

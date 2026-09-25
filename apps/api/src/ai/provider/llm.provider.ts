@@ -44,4 +44,4 @@ export interface LlmProvider {
   chat(request: LlmRequest): Promise<LlmResponse>;
 }
 
-export const LLM_PROVIDER = 'LLM_PROVIDER';
+export const LLM_PROVIDER = Symbol('LLM_PROVIDER');

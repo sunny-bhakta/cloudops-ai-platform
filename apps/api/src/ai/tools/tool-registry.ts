@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { GetServiceHealthTool } from "./implementations/get-service-health.tool";
-import { AiTool } from "./tools.types";
+import { GetServiceHealthTool } from "./implementations/get-service-health.tool.js";
+import { AiTool } from "./tools.types.js";
 
 @Injectable()
 export class ToolRegistry {

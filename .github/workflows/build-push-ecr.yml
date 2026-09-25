@@ -28,6 +28,16 @@ jobs:
         uses: actions/checkout@v4
 
       # ---------------------------------------------------------
+      # Setup Node.js (match Docker major)
+      # ---------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: apps/api/package-lock.json
+
+      # ---------------------------------------------------------
       # Debug repository
       # ---------------------------------------------------------
       - name: Debug repository

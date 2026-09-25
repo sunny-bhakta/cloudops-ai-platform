@@ -1,62 +1,28 @@
-FROM node:22.22.3-bookworm-slim AS deps
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN node -v && npm -v
+RUN node --version && npm --version
 
-RUN echo "--- deps stage manifest check ---" \
-  && ls -la \
-  && grep -n "\"typescript\"" package.json || true \
-  && grep -n "\"typescript\"" package-lock.json | head -n 20 || true
-
-RUN npm ci --verbose \
-	|| (echo "npm ci failed in deps stage" \
-			&& ls -la /root/.npm/_logs || true \
-			&& cat /root/.npm/_logs/*-debug-0.log || true \
-			&& exit 1)
-
-
-FROM node:22.22.3-bookworm-slim AS builder
-
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
 
-
-FROM node:22.22.3-bookworm-slim AS prod-deps
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN node -v && npm -v
-
-RUN echo "--- prod-deps stage manifest check ---" \
-  && ls -la \
-  && grep -n "\"typescript\"" package.json || true \
-  && grep -n "\"typescript\"" package-lock.json | head -n 20 || true
-
-RUN npm ci --omit=dev --verbose \
-	|| (echo "npm ci --omit=dev failed in prod-deps stage" \
-			&& ls -la /root/.npm/_logs || true \
-			&& cat /root/.npm/_logs/*-debug-0.log || true \
-			&& exit 1)
+RUN npm prune --omit=dev
 
 
-FROM node:22.22.3-bookworm-slim AS production
+FROM node:24-alpine AS production
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=prod-deps /app/node_modules ./node_modules
-
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000

@@ -51,7 +51,7 @@ jobs:
       # Typecheck
       # ---------------------------------------------------------
       - name: Typecheck
-        run: npx tsc --noEmit
+        run: npx tsc --project tsconfig.build.json --noEmit
 
       # ---------------------------------------------------------
       # Build

@@ -7,10 +7,15 @@ on:
       - ".github/workflows/terraform.yml"
 
   push:
+    # TODO: In future, restrict to main after workflow/secrets are stable.
+    # Example:
+    # branches:
+    #   - main
     branches:
-      - main
+      - "**"
     paths:
       - "infra/terraform/**"
+      - ".github/workflows/terraform.yml"
 
   workflow_dispatch:
 

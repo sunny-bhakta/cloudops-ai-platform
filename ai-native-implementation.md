@@ -392,3 +392,154 @@ Goal of PR-1: deliver one safe vertical slice in `apps/api`:
 - [ ] Tests pass
 - [ ] `/ai/chat` smoke test passes
 - [ ] Audit log includes correlation ID end-to-end
+
+
+Based on the blueprint and where we are now, I’d structure the **remaining work** like this. 
+
+### Current status
+
+* ✅ PR-1 AI slice implemented
+* ✅ PR-2 Terraform infrastructure implemented
+* ✅ ECR + GitHub Actions image build/push
+* ✅ Secrets Manager
+* ✅ IAM
+* ✅ ECS Fargate
+* ✅ ALB + Target Group
+* ✅ CloudWatch Logs
+* ✅ CloudWatch alarms
+* ✅ Terraform apply successful
+* ✅ `/health` through ALB working
+* 🔄 **PR-2 hardening/verification is the immediate next step**
+
+### Next topics
+
+**1. PR-2 — Application smoke test**
+
+* Test `POST /ai/chat`
+* Verify ECS can access `GROQ_API_KEY`
+* Verify actual AI response
+* Check application logs
+* Make sure secrets aren't logged
+
+**2. PR-2 — Security verification**
+
+* Verify Secrets Manager configuration
+* Verify ECS execution/task IAM permissions
+* Verify security-group flow
+* Verify no unnecessary public access
+* Verify sensitive data isn't exposed in logs
+
+**3. PR-2 — CloudWatch verification**
+
+* CPU alarm
+* Memory alarm
+* ALB/5xx and latency alarms, if configured
+* Confirm alarm states and metric dimensions
+
+**4. PR-2 — Terraform final verification**
+
+* `terraform plan` → no changes
+* Review outputs
+* Confirm state is clean
+* Document the deployed architecture
+
+---
+
+### Then PR-3 — Platform/Ops
+
+**5. GitHub Actions CI hardening**
+
+* Build/test workflow
+* Terraform validation
+* Terraform plan workflow
+* Security checks
+* Dependency scanning
+* Secrets scanning
+* Terraform/IaC security scanning
+
+**6. `/ops` structure**
+
+```text
+ops/
+├── runbooks/
+├── slo/
+└── incident-templates/
+```
+
+**7. SLO/SLI**
+
+* `/ai/chat` latency
+* Availability
+* Error rate
+* AI/tool-call success rate
+* Basic operational targets
+
+**8. Runbooks**
+
+* ECS deployment failure
+* AI/Groq outage
+* Tool-call failure
+* ECS task unhealthy
+* ALB 5xx
+* Rollback procedure
+
+---
+
+### PR-4 — Controlled AI Actions
+
+**9. `createIncident` tool**
+
+* Tool contract
+* Validation
+* Authorization
+* Audit logging
+
+**10. `triggerDeploy` tool**
+
+* Strict allow-list
+* RBAC
+* Human approval
+* Idempotency
+* Timeout/retry
+* Audit trail
+
+**11. AI safety/guardrails**
+
+* Prompt-injection defenses
+* Tool permission enforcement
+* PII redaction
+* Never expose secrets
+* Risky-operation approval
+
+---
+
+### After PR-4 — AI platform maturity
+
+**12. RAG**
+
+* Knowledge/document ingestion
+* Embeddings
+* Vector store
+* Retrieval
+* Grounded `/ai/chat` responses
+
+**13. AI cost/quality**
+
+* Token usage
+* Cost per request
+* Model fallback
+* Caching
+* Latency optimization
+
+**14. Production maturity**
+
+* Autoscaling
+* Stage/prod environments
+* Deployment promotion
+* Rollback validation
+* Incident drills
+
+This follows the blueprint's progression from **PR-2 → PR-3 → PR-4 → RAG/production maturity**. 
+
+**So the immediate next topic is #1: test `POST /ai/chat` through the ALB.**
+

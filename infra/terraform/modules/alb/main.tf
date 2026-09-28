@@ -58,9 +58,9 @@ resource "aws_security_group" "ecs" {
 }
 
 resource "aws_lb" "main" {
-  name               = "${var.project_name}-${var.environment}-alb"
-  internal           = false
-  load_balancer_type = "application"
+  name                       = "${var.project_name}-${var.environment}-alb"
+  internal                   = false
+  load_balancer_type         = "application"
   drop_invalid_header_fields = true
   enable_deletion_protection = true
 

@@ -15,6 +15,7 @@ import { AiLogger } from './observability/ai.logger.js';
 import { PiiRedactionService } from './guardrails/pii-redaction.service.js';
 import { PromptSafetyService } from './guardrails/prompt-safety.service.js';
 import { AiMetrics } from './observability/ai.metrics.js';
+import { ToolSecurityService } from './tools/tool-security.service.js';
 
 @Module({
   controllers: [
@@ -32,6 +33,7 @@ import { AiMetrics } from './observability/ai.metrics.js';
     PromptSafetyService,
     AiLogger,
     AiMetrics,
+    ToolSecurityService,
 
     {
       provide: LLM_PROVIDER,
@@ -41,6 +43,7 @@ import { AiMetrics } from './observability/ai.metrics.js';
 
   exports: [
     AiService,
+    ToolSecurityService
   ],
 })
 export class AiModule { }

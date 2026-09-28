@@ -1,47 +1,71 @@
-import { ToolExecutor } from "./tool-executor.js";
-import { AiTool } from "./tools.types.js";
+import { ToolExecutor } from './tool-executor.js';
+import type { AiTool } from './tools.types.js';
 
 describe('ToolExecutor', () => {
-    // let toolExecutor: ToolExecutor;
+    const makeTool = (): AiTool<
+        { service: string },
+        { status: string }
+    > => ({
+        name: 'getServiceHealth',
+        description: 'Check service health',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                service: {
+                    type: 'string',
+                },
+            },
+            required: ['service'],
+            additionalProperties: false,
+        },
+        permission: 'service:health:read',
+        timeoutMs: 3000,
+        retry: {
+            maxAttempts: 2,
+        },
+        idempotent: true,
+        execute: async (input) => ({
+            status: `healthy:${input.service}`,
+        }),
+    });
 
-    // beforeEach(() => {
-    //     toolExecutor = new ToolExecutor();
-    // });
+    it('executes a tool and returns the result', async () => {
+        const permissionService = {
+            hasPermission: () => true,
+        };
 
-    // it('should execute a tool and return the result', async () => {
-    //     const tool: AiTool<{ service: string }, { status: string }> = {
-    //         name: 'getServiceHealth',
+        const toolExecutor = new ToolExecutor(
+            permissionService,
+        );
 
-    //         description: 'Check service health',
+        const result = await toolExecutor.execute(
+            makeTool(),
+            { service: 'payments' },
+            ['service:health:read'],
+        );
 
-    //         inputSchema: {
-    //             type: 'object',
-    //             properties: {
-    //                 service: {
-    //                     type: 'string',
-    //                 },
-    //             },
-    //             required: ['service'],
-    //             additionalProperties: false,
-    //         },
+        expect(result).toEqual({
+            status: 'healthy:payments',
+        });
+    });
 
-    //         permission: 'service:health:read',
+    it('throws when user lacks required permission', async () => {
+        const permissionService = {
+            hasPermission: () => false,
+        };
 
-    //         timeoutMs: 3000,
+        const toolExecutor = new ToolExecutor(
+            permissionService,
+        );
 
-    //         retry: {
-    //             maxAttempts: 2,
-    //         },
-
-    //         idempotent: true,
-
-    //         execute: async (input) => ({
-    //             status: `healthy:${input.service}`,
-    //         }),
-    //     };
-
-    //     const result = await toolExecutor.execute(tool, { service: 'payments' });
-    //     expect(result).toEqual({ status: 'healthy:payments' });
-    // });
-
-})
+        await expect(
+            toolExecutor.execute(
+                makeTool(),
+                { service: 'payments' },
+                [],
+            ),
+        ).rejects.toThrow(
+            'Permission denied for AI tool "getServiceHealth"',
+        );
+    });
+});

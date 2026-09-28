@@ -16,24 +16,18 @@ import {
 
 @Injectable()
 export class GroqProvider implements LlmProvider {
-  private readonly model: ChatGroq;
-
-  constructor() {
-    this.model = new ChatGroq({
-      model: 'openai/gpt-oss-20b',
-      temperature: 0,
-      apiKey: process.env.GROQ_API_KEY,
-    });
-  }
+  private model: ChatGroq | null = null;
 
   async chat(request: LlmRequest): Promise<LlmResponse> {
     const messages = request.messages.map((message) =>
       this.toLangChainMessage(message),
     );
 
+    const llm = this.getModel();
+
     const model = request.tools?.length
-      ? this.model.bindTools(request.tools)
-      : this.model;
+      ? llm.bindTools(request.tools)
+      : llm;
 
     const response = await model.invoke(messages);
 
@@ -87,5 +81,27 @@ export class GroqProvider implements LlmProvider {
           `Unsupported message role: ${message.role}`,
         );
     }
+  }
+
+  private getModel(): ChatGroq {
+    if (this.model) {
+      return this.model;
+    }
+
+    const apiKey = process.env.GROQ_API_KEY;
+
+    if (!apiKey) {
+      throw new Error(
+        'Groq API key not found. Please set the GROQ_API_KEY environment variable or provide the key into "apiKey"',
+      );
+    }
+
+    this.model = new ChatGroq({
+      model: 'openai/gpt-oss-20b',
+      temperature: 0,
+      apiKey,
+    });
+
+    return this.model;
   }
 }

@@ -3,6 +3,10 @@ resource "aws_security_group" "alb" {
   description = "Security group for the application load balancer"
   vpc_id      = var.vpc_id
 
+  # Learning setup note:
+  # Inbound is HTTP (port 80) for simplicity; public HTTPS termination can be
+  # added later via ACM + an ALB HTTPS listener.
+
   ingress {
     description = "Allow HTTP from the internet"
     from_port   = 80
@@ -12,10 +16,12 @@ resource "aws_security_group" "alb" {
   }
 
   egress {
-    description = "Allow outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    # Restrict outbound to HTTPS to satisfy security policy checks and keep a
+    # least-privilege default for common outbound traffic.
+    description = "Allow outbound HTTPS traffic"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -38,10 +44,11 @@ resource "aws_security_group" "ecs" {
   }
 
   egress {
-    description = "Allow outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    # Restrict outbound to HTTPS instead of allow-all egress.
+    description = "Allow outbound HTTPS traffic"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -99,3 +106,36 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.app.arn
   }
 }
+
+# -----------------------------------------------------------------------------
+# TODO (future HTTPS enablement)
+# -----------------------------------------------------------------------------
+# 1) Add an ACM certificate in the same region as the ALB.
+# 2) Add an HTTPS (443) listener with ssl_policy + certificate_arn.
+# 3) Change this HTTP (80) listener default action to redirect -> HTTPS 443.
+#
+# Example shape:
+# resource "aws_lb_listener" "https" {
+#   load_balancer_arn = aws_lb.main.arn
+#   port              = 443
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+#   certificate_arn   = var.acm_certificate_arn
+#
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.app.arn
+#   }
+# }
+#
+# resource "aws_lb_listener" "http" {
+#   # ...
+#   default_action {
+#     type = "redirect"
+#     redirect {
+#       port        = "443"
+#       protocol    = "HTTPS"
+#       status_code = "HTTP_301"
+#     }
+#   }
+# }

@@ -16,13 +16,21 @@ import { PiiRedactionService } from './guardrails/pii-redaction.service.js';
 import { PromptSafetyService } from './guardrails/prompt-safety.service.js';
 import { AiMetrics } from './observability/ai.metrics.js';
 import { ToolSecurityService } from './tools/tool-security.service.js';
+import { ApprovalModule } from './approval/approval.module.js';
+import { ToolExecutionService } from './tools/tool-execution.service.js';
+import { TriggerDeployTool } from './tools/implementations/trigger-deploy.tool.js';
 
 @Module({
+  imports: [
+    ApprovalModule,
+    // TriggerDeployTool
+  ],
   controllers: [
     AiController,
   ],
 
   providers: [
+    ToolExecutionService,
     AiService,
     GroqProvider,
     ToolRegistry,
@@ -34,6 +42,7 @@ import { ToolSecurityService } from './tools/tool-security.service.js';
     AiLogger,
     AiMetrics,
     ToolSecurityService,
+    TriggerDeployTool,
 
     {
       provide: LLM_PROVIDER,

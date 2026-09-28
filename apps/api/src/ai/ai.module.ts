@@ -16,13 +16,29 @@ import { PiiRedactionService } from './guardrails/pii-redaction.service.js';
 import { PromptSafetyService } from './guardrails/prompt-safety.service.js';
 import { AiMetrics } from './observability/ai.metrics.js';
 import { ToolSecurityService } from './tools/tool-security.service.js';
+import { ApprovalModule } from './approval/approval.module.js';
+import { ToolExecutionService } from './tools/tool-execution.service.js';
+import { TriggerDeployTool } from './tools/implementations/trigger-deploy.tool.js';
+import { AuthzService } from './guardrails/authz.service.js';
+import { PolicyService } from './guardrails/policy.service.js';
+import { ToolExecutorService } from './tools/tool-executor.service.js';
+import { AuditModule } from './audit/audit.module.js';
+import { AuditService } from './audit/audit.service.js';
 
 @Module({
+  imports: [
+    ApprovalModule,
+    AuditModule,
+    // TriggerDeployTool
+  ],
   controllers: [
     AiController,
   ],
 
   providers: [
+    AuthzService,
+    PolicyService,
+    ToolExecutionService,
     AiService,
     GroqProvider,
     ToolRegistry,
@@ -34,6 +50,8 @@ import { ToolSecurityService } from './tools/tool-security.service.js';
     AiLogger,
     AiMetrics,
     ToolSecurityService,
+    TriggerDeployTool,
+    ToolExecutorService,
 
     {
       provide: LLM_PROVIDER,
@@ -43,7 +61,11 @@ import { ToolSecurityService } from './tools/tool-security.service.js';
 
   exports: [
     AiService,
-    ToolSecurityService
+    ToolSecurityService,
+    ToolRegistry,
+    ToolExecutor,
+    ToolExecutorService,
+    AuditService,
   ],
 })
 export class AiModule { }

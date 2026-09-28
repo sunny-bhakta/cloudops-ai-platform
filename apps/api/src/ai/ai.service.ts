@@ -12,13 +12,15 @@ import {
 import {
     ToolRegistry,
 } from './tools/tool-registry.js';
-import { ToolExecutor } from './tools/tool-executor.js';
 import { randomUUID } from 'node:crypto';
 import { AiLogger } from './observability/ai.logger.js';
 import { PromptSafetyService } from './guardrails/prompt-safety.service.js';
 import { AiMetrics } from './observability/ai.metrics.js';
 import { AiRequestContext } from '../security/ai-request-context.js';
 import { AiChatResponse, ToolAction } from './ai.types.js';
+import { ToolExecutorService } from './tools/tool-executor.service.js';
+import { AuditService } from './audit/audit.service.js';
+import { AiRole } from './guardrails/policy.types.js';
 
 @Injectable()
 export class AiService {
@@ -28,13 +30,18 @@ export class AiService {
         @Inject(LLM_PROVIDER)
         private readonly llmProvider: LlmProvider,
         private readonly toolRegistry: ToolRegistry,
-        private readonly toolExecutor: ToolExecutor,
+    private readonly toolExecutorService: ToolExecutorService,
         private readonly aiLogger: AiLogger,
         private readonly promptSafety: PromptSafetyService,
         private readonly aiMetrics: AiMetrics,
+        private readonly auditService: AuditService,
     ) { }
 
-    async chat(message: string, requestId?: string): Promise<AiChatResponse> {
+    async chat(
+        message: string,
+        requestId?: string,
+        role: AiRole = 'admin',
+    ): Promise<AiChatResponse> {
         const correlationId = requestId ?? randomUUID();
         const startedAt = Date.now();
 
@@ -50,6 +57,18 @@ export class AiService {
             message,
         );
 
+        await this.auditService.record({
+            correlationId,
+            eventType: 'AI_REQUEST_STARTED',
+            actor: {
+                id: 'system:ai-chat',
+                role,
+            },
+            data: {
+                message,
+            },
+        });
+
         const safety = this.promptSafety.check(message);
 
         if (!safety.allowed) {
@@ -64,6 +83,21 @@ export class AiService {
                 durationMs,
                 'blocked',
             );
+
+            await this.auditService.record({
+                correlationId,
+                eventType: 'AI_REQUEST_BLOCKED',
+                actor: {
+                    id: 'system:ai-chat',
+                    role,
+                },
+                data: {
+                    message,
+                    reason:
+                        safety.reason ??
+                        'Prompt safety policy blocked request',
+                },
+            });
 
             return {
                 content:
@@ -147,7 +181,7 @@ export class AiService {
                         messages,
                         tools,
                     });
-                45
+
                 /*
                  * No tool requested.
                  *
@@ -165,6 +199,24 @@ export class AiService {
                         durationMs,
                         'success',
                     );
+
+                    await this.auditService.record({
+                        correlationId,
+                        eventType: 'AI_REQUEST_COMPLETED',
+                        actor: {
+                            id: 'system:ai-chat',
+                            role,
+                        },
+                        data: {
+                            toolActionsCount:
+                                toolActions.length,
+                            responsePreview:
+                                response.content.slice(
+                                    0,
+                                    200,
+                                ),
+                        },
+                    });
 
                     return {
                         content: response.content,
@@ -217,10 +269,16 @@ export class AiService {
                     let result;
 
                     try {
-                        result = await this.toolExecutor.execute(
-                            tool,
-                            toolCall.input,
-                            logContext.permissions,
+                        const parsedInput =
+                            this.parseToolCallInput(
+                                toolCall,
+                            );
+
+                        result = await this.toolExecutorService.execute(
+                            toolCall.name,
+                            parsedInput,
+                            role,
+                            `${correlationId}:${toolCall.id}`,
                         );
 
                         this.aiMetrics.toolCompleted(
@@ -242,6 +300,27 @@ export class AiService {
                         toolCall.input,
                         result,
                     );
+
+                    await this.auditService.record({
+                        correlationId,
+                        eventType: 'AI_TOOL_EXECUTED',
+                        actor: {
+                            id: 'system:ai-chat',
+                            role,
+                        },
+                        data: {
+                            toolName: toolCall.name,
+                            toolCallId: toolCall.id,
+                            input: toolCall.input as Record<
+                                string,
+                                unknown
+                            >,
+                            result: result as Record<
+                                string,
+                                unknown
+                            >,
+                        },
+                    });
 
                     toolActions.push({
                         tool: toolCall.name,
@@ -287,7 +366,39 @@ export class AiService {
                 durationMs,
             );
 
+            await this.auditService.record({
+                correlationId,
+                eventType: 'AI_REQUEST_FAILED',
+                actor: {
+                    id: 'system:ai-chat',
+                    role,
+                },
+                data: {
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : String(error),
+                },
+            });
+
             throw error;
         }
+    }
+
+    private parseToolCallInput(
+        toolCall: {
+            input?: unknown;
+            arguments?: unknown;
+        },
+    ): unknown {
+        const rawInput =
+            toolCall.arguments ??
+            toolCall.input;
+
+        if (typeof rawInput === 'string') {
+            return JSON.parse(rawInput);
+        }
+
+        return rawInput;
     }
 }

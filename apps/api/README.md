@@ -1,114 +1,1655 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# CloudOps AI Platform
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## AI-Native Single-Repo Implementation Roadmap
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+> **Architecture:** Single repository · NestJS · AWS · Terraform · ECS/Fargate · GitHub Actions · No Kubernetes
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# 1. Target Architecture
 
-## Project setup
+```text
+cloudops-ai-platform/
 
-```bash
-$ npm install
+├── apps/
+│   └── api/
+│       └── src/
+│           ├── ai/
+│           │   ├── ai.controller.ts
+│           │   ├── ai.service.ts
+│           │   ├── provider/
+│           │   ├── tools/
+│           │   ├── guardrails/
+│           │   └── observability/
+│           │
+│           └── ...
+│
+├── infra/
+│   └── terraform/
+│       ├── modules/
+│       └── envs/
+│           ├── dev/
+│           ├── stage/
+│           └── prod/
+│
+├── ops/
+│   ├── runbooks/
+│   ├── slo/
+│   └── incident-templates/
+│
+├── knowledge/
+│   ├── docs/
+│   └── runbooks/
+│
+└── .github/
+    └── workflows/
+        ├── ci.yml
+        ├── terraform-plan.yml
+        ├── terraform-apply.yml
+        └── security.yml
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+# 2. AI-Native Production Capabilities
 
-# watch mode
-$ npm run start:dev
+The platform should eventually support:
 
-# production mode
-$ npm run start:prod
+* Natural-language requests
+* AI provider abstraction
+* Tool calling
+* Tool-level RBAC
+* Human approval for risky operations
+* Prompt-injection protection
+* PII/secrets redaction
+* Correlation IDs
+* Structured audit logging
+* AI metrics
+* Provider fallback
+* Model routing
+* RAG / knowledge retrieval
+* AI evaluation
+* Cost/token tracking
+* Operational automation
+
+---
+
+# 3. Core Contracts
+
+## API Contract
+
+AI responses should support:
+
+* Final response
+* Context/citations where applicable
+* Tools/actions performed
+* Safety metadata
+* Correlation ID
+
+## Tool Contract
+
+Every tool should define:
+
+```text
+Tool
+├── name
+├── description
+├── input schema
+├── permission scope
+├── timeout
+├── retry policy
+├── idempotency behavior
+└── approval requirement
 ```
 
-## Run tests
+## Security Contract
 
-```bash
-# unit tests
-$ npm run test
+Define:
 
-# e2e tests
-$ npm run test:e2e
+* Which roles can execute each tool
+* Which tools require approval
+* Which inputs are allowed
+* What must be redacted
+* What must never be exposed to the model/user
 
-# test coverage
-$ npm run test:cov
+---
+
+# 4. Overall PR Roadmap
+
+| PR       | Area                                | Status     |
+| -------- | ----------------------------------- | ---------- |
+| **PR-1** | AI Foundation / Safe Vertical Slice | ✅ Complete |
+| **PR-2** | AWS Infrastructure / Terraform      | ✅ Complete |
+| **PR-3** | CI/CD + Platform/Ops                | ✅ Complete |
+| **PR-4** | Controlled AI Actions               | 🚧 Current |
+| **PR-5** | Production Readiness                | ⏳          |
+| **PR-6** | Advanced AI / Knowledge             | ⏳          |
+| **PR-7** | Deployment + Operations             | ⏳          |
+| **PR-8** | Advanced AI Platform                | ⏳          |
+| **PR-9** | High Availability / Multi-Region    | ⏳          |
+
+---
+
+# 5. PR-1 — AI Foundation
+
+## Goal
+
+Deliver the first safe AI vertical slice.
+
+### Features
+
+### Feature 1 — NestJS AI Module
+
+* AI module
+* Controller
+* Service structure
+
+### Feature 2 — `POST /ai/chat`
+
+* AI request DTO
+* Response DTO
+* Request validation
+
+### Feature 3 — Provider Abstraction
+
+* `LlmProvider`
+* Provider-independent AI service
+
+### Feature 4 — Groq Provider
+
+* Groq integration
+* Provider configuration
+* Normalized responses
+
+### Feature 5 — AI Tool Contract
+
+* Tool interface
+* Tool metadata
+
+### Feature 6 — Tool Registry
+
+* Tool registration
+* Tool lookup
+* Tool discovery
+
+### Feature 7 — `getServiceHealth`
+
+* Read-only tool
+* Stable machine-friendly response
+
+### Feature 8 — AI Tool Calling
+
+* Detect tool calls
+* Execute tools
+* Return tool results to model
+
+### Feature 9 — Tool Validation
+
+* Validate tool arguments
+* Reject invalid inputs
+
+### Feature 10 — Basic Authorization
+
+* Tool-level authorization
+* Unauthorized tool rejection
+
+### Feature 11 — Correlation IDs
+
+* Request correlation
+* Tool-call correlation
+* Response correlation
+
+### Feature 12 — AI Metrics
+
+Track:
+
+* Request latency
+* Tool success/failure
+* Provider failures
+* Fallback where applicable
+
+### Feature 13 — AI Logging
+
+* Structured logs
+* Request ID
+* Tool events
+* Outcome
+
+### Feature 14 — PR-1 Hardening
+
+* Build
+* Typecheck
+* Smoke testing
+* `/ai/chat` validation
+
+**Status: ✅ Complete**
+
+---
+
+# 6. PR-2 — AWS Infrastructure / Terraform
+
+## Goal
+
+Deploy the AI platform infrastructure on AWS without Kubernetes.
+
+### Features
+
+* Terraform foundation
+* Environment structure
+* VPC/networking
+* ECR
+* Secrets Manager
+* IAM
+* CloudWatch Logs
+* ECS Fargate
+* ALB
+* Target Group
+* ECS Service
+* Health checks
+* CloudWatch alarms
+* Terraform outputs
+* Deployment validation
+
+### CI Infrastructure
+
+* Terraform validation
+* Terraform plan
+* Terraform apply workflow
+
+### AWS Validation
+
+* `/health` through ALB
+* ECS task health
+* Secrets configuration
+* IAM permissions
+* CloudWatch logs
+* Alarm configuration
+
+**Status: ✅ Complete**
+
+---
+
+# 7. PR-3 — CI/CD + Platform/Ops
+
+## Goal
+
+Establish operational and deployment standards.
+
+### Features 15–22
+
+### Feature 15 — CI Build Pipeline
+
+* Install dependencies
+* Build
+* Typecheck
+
+### Feature 16 — Test Pipeline
+
+* Test workflow
+* CI test execution
+
+### Feature 17 — Security CI
+
+* Dependency scanning
+* Secrets scanning
+* Security checks
+
+### Feature 18 — Terraform Security
+
+* IaC scanning
+* Terraform validation
+* Policy checks
+
+### Feature 19 — Terraform Plan CI
+
+* Automated plan
+* Pull-request visibility
+
+### Feature 20 — Ops Structure
+
+```text
+ops/
+├── runbooks/
+├── slo/
+└── incident-templates/
 ```
 
-## Deployment
+### Feature 21 — SLO / SLI
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Define:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+* `/ai/chat` availability
+* Latency
+* Error rate
+* Tool success rate
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### Feature 22 — Operational Runbooks
+
+Document:
+
+* ECS deployment failure
+* AI provider outage
+* Tool-call failure
+* ECS unhealthy task
+* ALB 5xx
+* Rollback procedure
+
+**Status: ✅ Complete**
+
+---
+
+# 8. PR-4 — Controlled AI Actions
+
+## Goal
+
+Move from read-only AI operations to **controlled operational actions**.
+
+The central rule:
+
+```text
+User
+  ↓
+AI
+  ↓
+Tool Request
+  ↓
+Security / RBAC
+  ↓
+Policy
+  ↓
+Approval?
+  ├── NO  → Execute
+  │
+  └── YES → Human Approval
+                 ↓
+              Execute
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+The LLM never decides whether it is authorized to perform an action.
 
-## Observability
+---
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+## Feature 23 — Tool Security Contract
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+Define the common security contract for every tool.
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+```text
+Tool
+├── name
+├── description
+├── input schema
+├── permission scope
+├── timeout
+├── retry policy
+├── idempotency
+└── approval requirement
+```
 
-## Resources
+Apply the contract to:
 
-Check out a few resources that may come in handy when working with NestJS:
+* `getServiceHealth`
+* `createIncident`
+* `triggerDeploy`
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+**Status: ✅ Complete**
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Feature 24 — RBAC + Policy Gate
 
-## Stay in touch
+Implement:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```text
+User
+ ↓
+Tool requested
+ ↓
+RBAC
+ ↓
+Policy evaluation
+ ↓
+ALLOW / DENY / REQUIRE_APPROVAL
+```
 
-## License
+Rules:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+* Viewer → read-only tools
+* Operator → operational tools according to policy
+* Admin → privileged operations according to policy
+* Destructive actions → approval
+
+**Important:** permissions come from authenticated application context, not from the LLM.
+
+**Status: ✅ Complete**
+
+---
+
+# Feature 25 — Controlled AI Tools
+
+Implement the two missing operational tools.
+
+## 25A — `createIncident`
+
+Purpose:
+
+* Create an operational incident
+* Validate incident input
+* Apply authorization
+* Generate correlation/request ID
+* Record audit event
+* Return stable incident information
+
+Example:
+
+```text
+AI
+ ↓
+createIncident
+ ↓
+RBAC
+ ↓
+Policy
+ ↓
+Execute
+ ↓
+Incident created
+```
+
+No infrastructure mutation.
+
+---
+
+## 25B — `triggerDeploy`
+
+Purpose:
+
+* Request a deployment
+* Validate service
+* Validate environment
+* Validate version
+* Enforce deployment allow-list
+* Require human approval
+
+Flow:
+
+```text
+AI
+ ↓
+triggerDeploy
+ ↓
+Validation
+ ↓
+RBAC
+ ↓
+Policy
+ ↓
+REQUIRE_APPROVAL
+ ↓
+PENDING_APPROVAL
+```
+
+`triggerDeploy` must **not** directly deploy merely because the model requested it.
+
+**Status: ✅ Complete**
+
+---
+
+# Feature 26 — Human Approval Workflow
+
+Implement:
+
+```text
+triggerDeploy
+      ↓
+Approval Request
+      ↓
+PENDING_APPROVAL
+      ↓
+Human
+ ┌────┴────┐
+ ↓         ↓
+APPROVE   REJECT
+ ↓
+Execute
+```
+
+Endpoints:
+
+```text
+GET  /ai/approvals/:approvalId
+
+POST /ai/approvals/:approvalId/approve
+
+POST /ai/approvals/:approvalId/reject
+```
+
+Record:
+
+* Approval ID
+* Request ID
+* Actor
+* Tool
+* Environment
+* Decision
+* Timestamp
+
+**Status: ✅ Complete**
+
+---
+
+# Feature 27 — Idempotency + Timeout + Retry
+
+Protect controlled actions against:
+
+* Duplicate requests
+* Network failures
+* Provider retries
+* Tool timeout
+* Partial failures
+
+Flow:
+
+```text
+Request
+ ↓
+Idempotency check
+ ↓
+Policy
+ ↓
+Execute
+ ↓
+Timeout protection
+ ↓
+Controlled retry
+ ↓
+Result
+```
+
+Deployment requests must not accidentally execute twice because of duplicate AI/tool calls.
+
+**Status: ✅ Complete**
+
+---
+
+# Feature 28 — Audit Logging
+
+Record every important security/action event.
+
+### Audit Events
+
+```text
+TOOL_REQUESTED
+TOOL_ALLOWED
+TOOL_DENIED
+
+APPROVAL_REQUIRED
+APPROVAL_GRANTED
+APPROVAL_REJECTED
+
+TOOL_EXECUTION_STARTED
+TOOL_EXECUTION_SUCCESS
+TOOL_EXECUTION_FAILED
+TOOL_EXECUTION_TIMEOUT
+```
+
+### Audit Fields
+
+```text
+auditId
+correlationId
+requestId
+toolName
+action
+actor
+role
+decision
+approvalId
+environment
+status
+timestamp
+error
+```
+
+### Never log
+
+```text
+GROQ_API_KEY
+AWS credentials
+passwords
+tokens
+secrets
+sensitive PII
+```
+
+Use the existing PII-redaction mechanism before writing audit/log data.
+
+**Status: 🚧 Current**
+
+---
+
+# Feature 29 — PR-4 Final Hardening
+
+Validate the complete controlled-action flow.
+
+### Scenario 1 — Normal Tool
+
+```text
+AI
+ ↓
+getServiceHealth
+ ↓
+ALLOW
+ ↓
+Execute
+ ↓
+Success
+```
+
+### Scenario 2 — Unauthorized Tool
+
+```text
+AI
+ ↓
+Tool
+ ↓
+RBAC
+ ↓
+DENY
+```
+
+### Scenario 3 — Deployment
+
+```text
+AI
+ ↓
+triggerDeploy
+ ↓
+Policy
+ ↓
+REQUIRE_APPROVAL
+ ↓
+PENDING_APPROVAL
+```
+
+### Scenario 4 — Approval
+
+```text
+Human Approval
+ ↓
+Approved
+ ↓
+Execute
+ ↓
+Audit
+```
+
+### Scenario 5 — Duplicate Request
+
+```text
+Duplicate request
+ ↓
+Idempotency check
+ ↓
+Existing request returned
+```
+
+### Scenario 6 — Timeout
+
+```text
+Tool
+ ↓
+Timeout
+ ↓
+Controlled retry
+ ↓
+Failure / recovery
+ ↓
+Audit
+```
+
+### Scenario 7 — Audit
+
+Verify:
+
+```text
+correlationId
+requestId
+tool
+actor
+decision
+result
+timestamp
+```
+
+**Target:**
+
+```text
+PR-4
+ ├── Security
+ ├── RBAC
+ ├── Policy
+ ├── Approval
+ ├── Idempotency
+ ├── Timeout
+ ├── Retry
+ └── Audit
+```
+
+---
+
+# 9. PR-5 — Production Readiness
+
+## Goal
+
+Make the AI application operationally production-ready.
+
+### Feature 30 — AI Audit Persistence
+
+Move audit events from temporary/in-memory storage to durable storage.
+
+Track:
+
+* Audit history
+* Approval history
+* Tool execution history
+* Request correlation
+
+---
+
+### Feature 31 — AI Request / Tool Metrics
+
+Track:
+
+* Request count
+* Request latency
+* Tool usage
+* Tool success/failure
+* Approval requests
+* Denied requests
+* Provider errors
+
+---
+
+### Feature 32 — Structured Logging
+
+Standardize JSON logs.
+
+Every relevant event should include:
+
+```text
+timestamp
+level
+service
+correlationId
+requestId
+toolName
+actor
+environment
+status
+error
+```
+
+---
+
+### Feature 33 — Error Handling & Recovery
+
+Standardize:
+
+* Provider errors
+* Tool errors
+* Validation errors
+* Authorization errors
+* Approval errors
+* Timeout errors
+* Retry exhaustion
+
+Return stable API errors.
+
+---
+
+### Feature 34 — AI Rate Limiting
+
+Protect `/ai/chat` against excessive requests.
+
+Consider:
+
+* Per-user limits
+* Per-tenant limits
+* Burst protection
+* Tool-specific limits
+
+---
+
+### Feature 35 — Prompt / Tool Security
+
+Harden against:
+
+* Prompt injection
+* Unsafe tool arguments
+* Tool impersonation
+* Privilege escalation
+* Secret extraction
+
+Principle:
+
+```text
+LLM output = untrusted input
+```
+
+---
+
+### Feature 36 — AI Evaluation
+
+Create repeatable evaluation scenarios.
+
+Examples:
+
+* Normal question
+* Tool call
+* Unauthorized tool
+* Malicious prompt
+* Approval-required action
+* Provider failure
+* Timeout
+* Invalid tool arguments
+
+---
+
+### Feature 37 — Production Configuration
+
+Separate:
+
+```text
+dev
+stage
+prod
+```
+
+Configuration should cover:
+
+* AI provider
+* Model
+* Rate limits
+* Tool policies
+* Timeout
+* Retry
+* Feature flags
+
+---
+
+### Feature 38 — API Documentation
+
+Document:
+
+```text
+POST /ai/chat
+
+GET  /ai/approvals/:approvalId
+
+POST /ai/approvals/:approvalId/approve
+
+POST /ai/approvals/:approvalId/reject
+```
+
+Also document:
+
+* Tool contracts
+* Error responses
+* Authentication
+* Approval flow
+
+---
+
+### Feature 39 — PR-5 Final Hardening
+
+Final checks:
+
+* Security
+* Performance
+* Configuration
+* Logging
+* Metrics
+* Error handling
+* Rate limits
+* Documentation
+* Deployment validation
+
+---
+
+# 10. PR-6 — Advanced AI / Knowledge
+
+## Goal
+
+Introduce more capable AI workflows while preserving the security baseline.
+
+---
+
+## Feature 40 — Conversation Memory
+
+Support:
+
+* Conversation history
+* Context management
+* Request/session correlation
+* Context limits
+
+---
+
+## Feature 41 — RAG / Knowledge Retrieval
+
+Introduce the knowledge layer.
+
+```text
+Documents
+ ↓
+Chunking
+ ↓
+Embeddings
+ ↓
+Vector Store
+ ↓
+Retriever
+ ↓
+AI Context
+ ↓
+Grounded Response
+```
+
+Potential knowledge sources:
+
+* Runbooks
+* Architecture docs
+* Operational procedures
+* Internal documentation
+
+---
+
+## Feature 42 — Multi-Step Agent Workflow
+
+Support controlled sequences:
+
+```text
+Question
+ ↓
+Tool 1
+ ↓
+Tool 2
+ ↓
+Analysis
+ ↓
+Final response
+```
+
+Every step remains subject to tool policy.
+
+---
+
+## Feature 43 — Agent Planning
+
+Allow the AI to construct a plan before executing multiple actions.
+
+```text
+Request
+ ↓
+Plan
+ ↓
+Validate
+ ↓
+Execute approved steps
+ ↓
+Result
+```
+
+---
+
+## Feature 44 — Tool Result Validation
+
+Never blindly trust tool output.
+
+Validate:
+
+* Schema
+* Expected fields
+* Status
+* Size
+* Sensitive information
+
+---
+
+## Feature 45 — AI Cost / Token Tracking
+
+Track:
+
+* Input tokens
+* Output tokens
+* Total tokens
+* Estimated cost
+* Cost per request
+* Cost per tool workflow
+* Cost per model
+
+---
+
+## Feature 46 — AI Evaluation Dashboard
+
+Display:
+
+* Evaluation results
+* Tool success rate
+* Latency
+* Failure rate
+* Grounding signals
+* Cost
+* Provider fallback
+
+---
+
+## Feature 47 — Advanced Agent Guardrails
+
+Add stronger controls around:
+
+* Agent loops
+* Tool chaining
+* Maximum steps
+* Risk scoring
+* Sensitive operations
+* Context boundaries
+
+---
+
+## Feature 48 — PR-6 Final Hardening
+
+Validate:
+
+* Memory
+* RAG
+* Agent workflows
+* Planning
+* Tool validation
+* Cost tracking
+* Guardrails
+* Evaluation
+
+---
+
+# 11. PR-7 — Platform / DevOps
+
+## Goal
+
+Automate deployment and operational lifecycle.
+
+---
+
+## Feature 49 — CI/CD Deployment Automation
+
+Automate:
+
+```text
+Commit
+ ↓
+Build
+ ↓
+Security
+ ↓
+Test
+ ↓
+Image
+ ↓
+Deploy
+```
+
+---
+
+## Feature 50 — ECS Deployment Automation
+
+Automate:
+
+* ECS task definition
+* Service update
+* Deployment monitoring
+* Health validation
+
+---
+
+## Feature 51 — Terraform Stage/Prod Promotion
+
+Establish:
+
+```text
+dev
+ ↓
+stage
+ ↓
+prod
+```
+
+with explicit promotion gates.
+
+---
+
+## Feature 52 — Deployment Rollback
+
+Define and validate:
+
+```text
+Bad deployment
+ ↓
+Detection
+ ↓
+Rollback
+ ↓
+Previous version
+ ↓
+Health verification
+```
+
+---
+
+## Feature 53 — Secrets Rotation
+
+Implement:
+
+* Secret rotation strategy
+* Application reload strategy
+* Rotation verification
+
+---
+
+## Feature 54 — Backup / Recovery
+
+Define recovery for:
+
+* Audit data
+* Configuration
+* Application state
+* Knowledge data where applicable
+
+---
+
+## Feature 55 — Production Observability
+
+Centralize:
+
+* Application metrics
+* ECS metrics
+* ALB metrics
+* AI metrics
+* Tool metrics
+* Error metrics
+* Cost signals
+* Alerts
+* Dashboards
+
+---
+
+## Feature 56 — PR-7 Final Hardening
+
+Validate:
+
+* CI/CD
+* Deployment automation
+* Promotion
+* Rollback
+* Secrets
+* Recovery
+* Observability
+
+---
+
+# 12. PR-8 — Advanced AI Platform
+
+## Goal
+
+Optimize the AI platform for cost, quality, reliability, and controlled experimentation.
+
+---
+
+## Feature 57 — Model Router
+
+Route requests based on configurable criteria.
+
+```text
+AI Request
+    ↓
+Model Router
+    ├── Simple → cheaper model
+    ├── Complex → stronger model
+    └── Provider unavailable → fallback
+```
+
+Focus:
+
+* Provider abstraction
+* Routing rules
+* Model selection
+* Configurable thresholds
+* Fallback integration
+
+---
+
+## Feature 58 — Provider Fallback
+
+Implement:
+
+```text
+Primary Provider
+       ↓
+    Failure?
+       ↓
+Backup Provider
+       ↓
+Normalized Response
+```
+
+Handle:
+
+* Timeout
+* Provider errors
+* Retry limits
+* Fallback metrics
+* Correlation ID preservation
+
+---
+
+## Feature 59 — Prompt / Version Registry
+
+Introduce versioned prompts.
+
+Examples:
+
+```text
+incident-analysis:v1
+incident-analysis:v2
+deployment-assistant:v1
+```
+
+Track:
+
+* Prompt
+* Version
+* Created date
+* Status
+* Model compatibility
+
+---
+
+## Feature 60 — Prompt Experimentation
+
+Support controlled experiments.
+
+```text
+Request
+ ↓
+Experiment
+ ├── Prompt v1
+ └── Prompt v2
+```
+
+Capture:
+
+* Response quality
+* Latency
+* Cost
+* Tool success
+* Evaluation results
+
+---
+
+## Feature 61 — Offline Evaluation / Golden Dataset
+
+Create repeatable evaluation scenarios.
+
+Each scenario contains:
+
+```text
+Question
+Expected behavior
+Expected tool
+Expected safety decision
+Expected response characteristics
+```
+
+Include:
+
+* Normal request
+* Tool call
+* Unauthorized tool
+* Prompt injection
+* Approval-required operation
+* Provider failure
+* Timeout
+* Invalid arguments
+* RAG response
+
+---
+
+## Feature 62 — AI Quality Dashboard
+
+Combine:
+
+* Latency
+* Tool success
+* Tool failure
+* Fallback rate
+* Token usage
+* Cost
+* Approval requests
+* Denied requests
+* Evaluation results
+
+---
+
+## Feature 63 — Advanced Incident Automation
+
+Build controlled operational workflows.
+
+```text
+AI
+ ↓
+Detect issue
+ ↓
+getServiceHealth
+ ↓
+createIncident
+ ↓
+Approval if required
+ ↓
+triggerDeploy / recovery action
+ ↓
+Verify
+ ↓
+Audit
+```
+
+Destructive actions remain behind policy and approval.
+
+---
+
+## Feature 64 — PR-8 Final Hardening
+
+Validate:
+
+* Model routing
+* Provider fallback
+* Prompt versions
+* Experiments
+* Evaluation
+* Tool security
+* Rate limits
+* Cost controls
+* Auditability
+* Failure recovery
+
+---
+
+# 13. PR-9 — High Availability / Multi-Region
+
+## Goal
+
+Add multi-region resilience only if the platform's operational requirements justify the additional complexity.
+
+---
+
+## Feature 65 — Multi-Region Architecture
+
+```text
+                Global Entry
+                     │
+          ┌──────────┴──────────┐
+          ↓                     ↓
+      Region A               Region B
+          │                     │
+       ECS/API               ECS/API
+          │                     │
+       AI Stack              AI Stack
+```
+
+---
+
+## Feature 66 — Cross-Region Failover
+
+Define:
+
+* Failure detection
+* Traffic switching
+* Recovery
+* Health verification
+* Failback
+
+---
+
+## Feature 67 — Cross-Region Data Strategy
+
+Determine handling for:
+
+* Audit records
+* Configuration
+* Conversation state
+* RAG/knowledge data
+* Deployment state
+
+---
+
+## Feature 68 — Disaster Recovery Testing
+
+Run controlled scenarios:
+
+* Region unavailable
+* AI provider unavailable
+* Data unavailable
+* Deployment failure
+
+Document:
+
+* Recovery steps
+* Recovery time
+* Recovery dependencies
+* Lessons learned
+
+---
+
+## Feature 69 — PR-9 Final Hardening
+
+Validate:
+
+* Failover
+* Recovery
+* Data consistency
+* Operational procedures
+* Monitoring
+* Disaster recovery documentation
+
+---
+
+# 14. Final Feature Map
+
+```text
+PR-1 — AI Foundation
+  1  AI Module
+  2  /ai/chat
+  3  Provider Abstraction
+  4  Groq Provider
+  5  Tool Contract
+  6  Tool Registry
+  7  getServiceHealth
+  8  Tool Calling
+  9  Tool Validation
+ 10  Authorization
+ 11  Correlation IDs
+ 12  AI Metrics
+ 13  AI Logging
+ 14  PR-1 Hardening
+        │
+        ▼
+PR-2 — AWS / Terraform
+  Infrastructure + ECS + ALB + IAM + Secrets + CloudWatch
+        │
+        ▼
+PR-3 — CI/CD + Platform/Ops
+ 15  CI Build
+ 16  Tests
+ 17  Security CI
+ 18  Terraform Security
+ 19  Terraform Plan CI
+ 20  Ops Structure
+ 21  SLO/SLI
+ 22  Runbooks
+        │
+        ▼
+PR-4 — Controlled AI Actions
+ 23  Tool Security Contract
+ 24  RBAC + Policy Gate
+ 25  createIncident + triggerDeploy
+ 26  Human Approval
+ 27  Idempotency + Timeout + Retry
+ 28  Audit Logging
+ 29  PR-4 Hardening
+        │
+        ▼
+PR-5 — Production Readiness
+ 30  Audit Persistence
+ 31  AI Metrics
+ 32  Structured Logging
+ 33  Error Recovery
+ 34  Rate Limiting
+ 35  Prompt/Tool Security
+ 36  AI Evaluation
+ 37  Production Configuration
+ 38  API Documentation
+ 39  PR-5 Hardening
+        │
+        ▼
+PR-6 — Advanced AI / Knowledge
+ 40  Conversation Memory
+ 41  RAG / Knowledge Retrieval
+ 42  Multi-Step Agent Workflow
+ 43  Agent Planning
+ 44  Tool Result Validation
+ 45  Cost / Token Tracking
+ 46  Evaluation Dashboard
+ 47  Advanced Guardrails
+ 48  PR-6 Hardening
+        │
+        ▼
+PR-7 — Platform / DevOps
+ 49  CI/CD Deployment Automation
+ 50  ECS Deployment Automation
+ 51  Stage/Prod Promotion
+ 52  Rollback
+ 53  Secrets Rotation
+ 54  Backup / Recovery
+ 55  Production Observability
+ 56  PR-7 Hardening
+        │
+        ▼
+PR-8 — Advanced AI Platform
+ 57  Model Router
+ 58  Provider Fallback
+ 59  Prompt / Version Registry
+ 60  Prompt Experimentation
+ 61  Offline Evaluation
+ 62  AI Quality Dashboard
+ 63  Advanced Incident Automation
+ 64  PR-8 Hardening
+        │
+        ▼
+PR-9 — High Availability
+ 65  Multi-Region Architecture
+ 66  Cross-Region Failover
+ 67  Cross-Region Data Strategy
+ 68  Disaster Recovery Testing
+ 69  PR-9 Hardening
+```
+
+---
+
+# 15. Current Project Position
+
+```text
+PR-1  AI Foundation                 ✅
+PR-2  AWS / Terraform               ✅
+PR-3  CI/CD + Platform/Ops          ✅
+PR-4  Controlled AI Actions         🚧
+```
+
+### Current Feature
+
+```text
+Feature 28 — Audit Logging
+```
+
+### Next
+
+```text
+Feature 29 — PR-4 Final Hardening
+```
+
+### After PR-4
+
+```text
+PR-5
+ ↓
+Feature 30 — AI Audit Persistence
+```
+
+### Long-term
+
+```text
+PR-5 Production Readiness
+        ↓
+PR-6 Advanced AI / Knowledge
+        ↓
+PR-7 Platform / DevOps
+        ↓
+PR-8 Advanced AI Platform
+        ↓
+PR-9 High Availability
+```
+
+---
+
+# 16. Important Architecture Rule
+
+Throughout all PRs, preserve this boundary:
+
+```text
+                ┌─────────────────┐
+                │       User      │
+                └────────┬────────┘
+                         ↓
+                ┌─────────────────┐
+                │       AI        │
+                └────────┬────────┘
+                         ↓
+                ┌─────────────────┐
+                │   Tool Request  │
+                └────────┬────────┘
+                         ↓
+                ┌─────────────────┐
+                │ Schema Validate │
+                └────────┬────────┘
+                         ↓
+                ┌─────────────────┐
+                │      RBAC       │
+                └────────┬────────┘
+                         ↓
+                ┌─────────────────┐
+                │     Policy      │
+                └────────┬────────┘
+                         ↓
+              ┌──────────┴──────────┐
+              ↓                     ↓
+           ALLOW             REQUIRE_APPROVAL
+              ↓                     ↓
+           Execute              Human
+                                    ↓
+                              Approve / Reject
+                                    ↓
+                                  Execute
+                                    ↓
+                              Audit + Metrics
+```
+
+**The LLM is never the security boundary.**
+
+It can request an action, but the application decides whether that action is valid, authorized, approved, and executable.

@@ -1,15 +1,17 @@
 # SLO / SLI
 
-Service Level Indicators (SLIs) and Service Level Objectives (SLOs) for the CloudOps AI Platform.
+Service Level Indicators (SLIs) and Service Level Objectives (SLOs)
+for the CloudOps AI Platform.
 
-## Planned SLIs
+## Current SLOs
+
+See [ai-platform.md](./ai-platform.md).
+
+## Core indicators
 
 - API availability
+- API error rate
 - API latency
 - AI request success rate
 - AI request latency
 - ECS service health
-
-## Planned SLOs
-
-SLO targets will be defined in Feature 20.

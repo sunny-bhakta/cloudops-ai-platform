@@ -12,6 +12,17 @@ resource "aws_vpc" "main" {
   }
 }
 
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  ingress = []
+  egress  = []
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-default-sg"
+  }
+}
+
 module "networking" {
   source = "../../modules/networking"
 

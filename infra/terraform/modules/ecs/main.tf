@@ -69,6 +69,8 @@ resource "aws_ecs_task_definition" "app" {
           awslogs-stream-prefix = "ecs"
         }
       }
+
+      readonlyRootFilesystem = true
     }
   ])
 
@@ -82,7 +84,7 @@ resource "aws_ecs_service" "app" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.app.arn
 
-  launch_type  = "FARGATE"
+  launch_type   = "FARGATE"
   desired_count = var.desired_count
 
   platform_version = "LATEST"

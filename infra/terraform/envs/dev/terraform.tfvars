@@ -9,4 +9,4 @@ availability_zones = [
   "ap-south-1b"
 ]
 
-container_image_tag = "REPLACE_WITH_GIT_SHA"
+container_image_tag = "c4127ae2f10e37c760f9cbfa2c2599e43198622c"

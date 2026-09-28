@@ -1,6 +1,6 @@
 name: Terraform CI
 
-on:
+"on":
   pull_request:
     paths:
       - "infra/terraform/**"
@@ -11,6 +11,8 @@ on:
       - main
     paths:
       - "infra/terraform/**"
+
+  workflow_dispatch:
 
 permissions:
   contents: read
